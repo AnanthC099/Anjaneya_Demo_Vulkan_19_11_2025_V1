@@ -29,9 +29,9 @@ const float K_MIN_SEP_DEG         = 90.0f;
 const int   K_OVERLAY_COUNT       = 12;
 const float K_OVERLAY_SIZE_FRAC0  = 0.55f;
 float sOverlaySizeFrac      = K_OVERLAY_SIZE_FRAC0;
-float sPanSpeedDegPerSec    = 30.0f;
+float sPanSpeedDegPerSec    = 30.0f; //Imp for control
 
-const char* const gSkyboxFaces[6] =
+char* const gSkyboxFaces[6] =
 {
     "images_Scene1/right.png",
     "images_Scene1/left.png",
@@ -41,7 +41,7 @@ const char* const gSkyboxFaces[6] =
     "images_Scene1/back.png"
 };
 
-static const char* const gOverlayPathList[K_OVERLAY_COUNT] =
+char* const gOverlayPathList[K_OVERLAY_COUNT] =
 {
     "images_Scene1/01_Mesh.png", "images_Scene1/02_Vrushabh.png", "images_Scene1/03_Mithun.png",
     "images_Scene1/04_Karka.png","images_Scene1/05_Simha.png",    "images_Scene1/06_Kanya.png",
@@ -49,18 +49,18 @@ static const char* const gOverlayPathList[K_OVERLAY_COUNT] =
     "images_Scene1/10_Makar.png","images_Scene1/11_Kumbh.png",   "images_Scene1/12_Meen.png"
 };
 
-static VkImage        sSkyImage     = VK_NULL_HANDLE;
-static VkDeviceMemory sSkyMem       = VK_NULL_HANDLE;
-static VkImageView    sSkyView      = VK_NULL_HANDLE;
-static VkSampler      sSkySampler   = VK_NULL_HANDLE;
+VkImage sSkyImage = VK_NULL_HANDLE;
+VkDeviceMemory sSkyMem = VK_NULL_HANDLE;
+VkImageView sSkyView = VK_NULL_HANDLE;
+VkSampler sSkySampler = VK_NULL_HANDLE;
 
-static VkImage        sOverlayImages[K_OVERLAY_COUNT];
-static VkDeviceMemory sOverlayMem[K_OVERLAY_COUNT];
-static VkImageView    sOverlayViews[K_OVERLAY_COUNT];
-static VkSampler      sOverlaySamplers[K_OVERLAY_COUNT];
-static int            sOverlayBound   = -1;
-static int            sOverlayPending = -1;
-static BOOL           sCmdBuffersDirty = FALSE;
+VkImage sOverlayImages[K_OVERLAY_COUNT];
+VkDeviceMemory sOverlayMem[K_OVERLAY_COUNT];
+VkImageView sOverlayViews[K_OVERLAY_COUNT];
+VkSampler sOverlaySamplers[K_OVERLAY_COUNT];
+int sOverlayBound   = -1;
+int sOverlayPending = -1;
+BOOL sCmdBuffersDirty = FALSE;
 
 typedef enum CameraPhaseTag
 {
@@ -69,35 +69,30 @@ typedef enum CameraPhaseTag
     CAM_STOPPED
 } CameraPhase;
 
-static CameraPhase sCamPhase       = CAM_PAN;
-static glm::quat   sCamQ           = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-static glm::quat   sCamQStart      = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-static glm::quat   sCamQTarget     = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-static DWORD       sPhaseStartMs   = 0;
-static DWORD       sPanDurationMs  = 1200;
-static int         sPansDone       = 0;
+CameraPhase sCamPhase = CAM_PAN;
+glm::quat   sCamQ = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+glm::quat   sCamQStart = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+glm::quat   sCamQTarget = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+int sPhaseStartMs = 0;
+int sPanDurationMs = 1200;
+int sPansDone = 0;
 
-static float       sPendingBlendFade  = 0.0f;
-static float       sRecordedBlendFade = 0.0f;
+float sPendingBlendFade  = 0.0f;
+float sRecordedBlendFade = 0.0f;
 
-// === Showcase timeline ===
-// Scene0 (Intro) : pause 2s, fade in over 3s, hold for 7s, transition overlay across 8s
-// Scene1 (Main)  : run animation and linger 3s after it completes
-// Scene2 (Final) : hold combined main scene + credits for 10s before focus pull to finale
-// Scene3 (Finale): hold fully-focused composite for 5s, pause 3s, then fade to black over 5s
-static const DWORD K_SCENE0_FADE_IN_DELAY_MS        = 2000u;
-static const DWORD K_SCENE0_FADE_IN_MS              = 3000u;
-static const DWORD K_SCENE0_HOLD_MS                 = 7000u;
-static const DWORD K_SCENE0_OVERLAY_TRANSITION_MS   = 8000u;
-static const DWORD K_SCENE1_FADE_TO_BLACK_MS        = 3000u;
-static const DWORD K_SCENE1_POST_ANIM_EXTRA_MS      = 3000u;
-static const DWORD K_SCENE2_HOLD_MS                 = 10000u;
-static const DWORD K_SCENE2_FOCUS_PULL_MS           = 4500u;
-static const DWORD K_SCENE3_HOLD_MS                 = 5000u;
-static const DWORD K_SCENE3_PRE_FADE_WAIT_MS        = 3500u; // allow finale to breathe before fade
-static const DWORD K_SCENE3_FADE_TO_BLACK_MS        = 7000u; // longer tail for softer visual fade
-static const DWORD K_SCENE3_POST_BLACK_AUDIO_DELAY_MS = 5000u; // hold audio 5s after visuals fade
-static const DWORD K_SCENE3_AUDIO_FADE_MS           = K_SCENE3_FADE_TO_BLACK_MS; // reuse visual fade duration for audio
+const int K_SCENE0_FADE_IN_DELAY_MS = 2000;
+const int K_SCENE0_FADE_IN_MS = 3000;
+const int K_SCENE0_HOLD_MS = 7000;
+const int K_SCENE0_OVERLAY_TRANSITION_MS = 8000;
+const int K_SCENE1_FADE_TO_BLACK_MS = 3000;
+const int K_SCENE1_POST_ANIM_EXTRA_MS = 3000;
+const int K_SCENE2_HOLD_MS = 10000;
+const int K_SCENE2_FOCUS_PULL_MS = 4500;
+const int K_SCENE3_HOLD_MS = 5000;
+const int K_SCENE3_PRE_FADE_WAIT_MS = 3500;
+const int K_SCENE3_FADE_TO_BLACK_MS = 7000;
+const int K_SCENE3_POST_BLACK_AUDIO_DELAY_MS = 5000;
+const int K_SCENE3_AUDIO_FADE_MS = K_SCENE3_FADE_TO_BLACK_MS;
 
 typedef enum SequenceStateTag
 {
