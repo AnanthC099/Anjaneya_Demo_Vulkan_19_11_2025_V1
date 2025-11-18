@@ -121,8 +121,14 @@ BOOL sScene1StartedViaOverlay = FALSE;
 
 float ease01(float x)
 {
-    if (x < 0.0f) x = 0.0f;
-    if (x > 1.0f) x = 1.0f;
+    if (x < 0.0f)
+    {
+        x = 0.0f;
+    }
+    if (x > 1.0f)
+    {
+        x = 1.0f;
+    }
     return x * x * (3.0f - 2.0f * x);
 }
 
@@ -133,10 +139,22 @@ float frand01(void)
 
 void BindOverlayTexture(int which)
 {
-    if (which < 0) return;
-    if (which >= K_OVERLAY_COUNT) which = K_OVERLAY_COUNT - 1;
-    if (sOverlayBound == which) return;
-    if (sOverlayPending == which) return;
+    if (which < 0)
+    {
+        return;
+    }
+    if (which >= K_OVERLAY_COUNT)
+    {
+        which = K_OVERLAY_COUNT - 1;
+    }
+    if (sOverlayBound == which)
+    {
+        return;
+    }
+    if (sOverlayPending == which)
+    {
+        return;
+    }
     sOverlayPending = which;
 }
 
@@ -176,22 +194,43 @@ DWORD CalcPanDurationMs(const glm::quat q0, const glm::quat q1)
 {
     glm::quat d = glm::normalize(q1 * glm::conjugate(q0));
     float w = d.w;
-    if (w < -1.0f) w = -1.0f;
-    if (w >  1.0f) w =  1.0f;
+    if (w < -1.0f)
+    {
+        w = -1.0f;
+    }
+    if (w >  1.0f)
+    {
+        w =  1.0f;
+    }
     float angleRad = 2.0f * acosf(w);
     float angleDeg = glm::degrees(angleRad);
     float denom = sPanSpeedDegPerSec;
-    if (denom < 1e-3f) denom = 1e-3f;
+    if (denom < 1e-3f)
+    {
+        denom = 1e-3f;
+    }
     float ms = (angleDeg / denom) * 1000.0f;
-    if (ms < 120.0f)   ms = 120.0f;
-    if (ms > 30000.0f) ms = 30000.0f;
+    if (ms < 120.0f)
+    {
+        ms = 120.0f;
+    }
+    if (ms > 30000.0f)
+    {
+        ms = 30000.0f;
+    }
     return (DWORD)(ms + 0.5f);
 }
 
 void SetPanSpeedDegPerSec(float s)
 {
-    if (s < 1.0f)   s = 1.0f;
-    if (s > 360.0f) s = 360.0f;
+    if (s < 1.0f)
+    {
+        s = 1.0f;
+    }
+    if (s > 360.0f)
+    {
+        s = 360.0f;
+    }
 
     DWORD now = GetTickCount();
     if (sCamPhase == CAM_PAN)
@@ -220,15 +259,24 @@ void SetPanSpeedDegPerSec(float s)
 
 void SetOverlaySizeFrac(float frac)
 {
-    if (frac < 0.05f) frac = 0.05f;
-    if (frac > 2.00f) frac = 2.00f;
+    if (frac < 0.05f)
+    {
+        frac = 0.05f;
+    }
+    if (frac > 2.00f)
+    {
+        frac = 2.00f;
+    }
     sOverlaySizeFrac = frac;
 }
 
 void BeginNewPanInternal(void)
 {
     int which = sPansDone;
-    if (which >= K_OVERLAY_COUNT) which = K_OVERLAY_COUNT - 1;
+    if (which >= K_OVERLAY_COUNT)
+    {
+        which = K_OVERLAY_COUNT - 1;
+    }
     BindOverlayTexture(which);
     sCamQStart     = sCamQ;
     sCamQTarget    = RandomOrientationFarFrom(sCamQ, K_MIN_SEP_DEG);
@@ -239,8 +287,14 @@ void BeginNewPanInternal(void)
 
 float Clamp01(float x)
 {
-    if (x < 0.0f) return 0.0f;
-    if (x > 1.0f) return 1.0f;
+    if (x < 0.0f)
+    {
+        return 0.0f;
+    }
+    if (x > 1.0f)
+    {
+        return 1.0f;
+    }
     return x;
 }
 
@@ -274,8 +328,14 @@ float ComputeOverlayFadeForPan(void)
             return 0.0f;
         }
         float u = (float)(elapsed - (sPanDurationMs - lead)) / (float)lead;
-        if (u < 0.0f) u = 0.0f;
-        if (u > 1.0f) u = 1.0f;
+        if (u < 0.0f)
+        {
+            u = 0.0f;
+        }
+        if (u > 1.0f)
+        {
+            u = 1.0f;
+        }
         return ease01(u);
     }
     else if (sCamPhase == CAM_HOLD)
@@ -287,8 +347,14 @@ float ComputeOverlayFadeForPan(void)
             return 1.0f;
         }
         float u = (float)(K_HOLD_DURATION_MS - t) / (float)out;
-        if (u < 0.0f) u = 0.0f;
-        if (u > 1.0f) u = 1.0f;
+        if (u < 0.0f)
+        {
+            u = 0.0f;
+        }
+        if (u > 1.0f)
+        {
+            u = 1.0f;
+        }
         return ease01(u);
     }
     return 0.0f;
@@ -522,7 +588,10 @@ void UpdateShowcaseSequenceInternal(void)
         elapsed = now - sSequenceStateStartMs;
         gCtx_Switcher.gFade = 1.0f; // fully visible
         UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        if (elapsed >= K_SCENE0_HOLD_MS) EnterSequenceState(SEQUENCE_SCENE0_OVERLAY_TRANSITION);
+        if (elapsed >= K_SCENE0_HOLD_MS)
+        {
+            EnterSequenceState(SEQUENCE_SCENE0_OVERLAY_TRANSITION);
+        }
         break;
 
     case SEQUENCE_SCENE0_OVERLAY_TRANSITION:
@@ -564,7 +633,10 @@ void UpdateShowcaseSequenceInternal(void)
         fadeProgress = Clamp01((now - sSequenceStateStartMs) / (float)K_SCENE1_FADE_TO_BLACK_MS);
         gCtx_Switcher.gFade = 1.0f - fadeProgress;
         UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        if (fadeProgress >= 1.0f) EnterSequenceState(SEQUENCE_SCENE2_HOLD);
+        if (fadeProgress >= 1.0f)
+        {
+            EnterSequenceState(SEQUENCE_SCENE2_HOLD);
+        }
         break;
 
     case SEQUENCE_SCENE2_HOLD:
@@ -645,7 +717,10 @@ void UpdateShowcaseSequenceInternal(void)
             gCtx_Switcher.gScene23FocusPullFactor = 0.0f;
             sCmdBuffersDirty = TRUE;
         }
-        if (fadeProgress >= 1.0f) EnterSequenceState(SEQUENCE_SCENE3_POST_BLACK_AUDIO_HOLD);
+        if (fadeProgress >= 1.0f)
+        {
+            EnterSequenceState(SEQUENCE_SCENE3_POST_BLACK_AUDIO_HOLD);
+        }
         break;
     }
 
@@ -667,7 +742,10 @@ void UpdateShowcaseSequenceInternal(void)
         fadeProgress = Clamp01((now - sSequenceStateStartMs) / (float)K_SCENE3_AUDIO_FADE_MS);
         float easedAudio = ease01(fadeProgress);
         SceneSwitcher_SetScene0AudioGain(1.0f - easedAudio);
-        if (fadeProgress >= 1.0f) EnterSequenceState(SEQUENCE_COMPLETE);
+        if (fadeProgress >= 1.0f)
+        {
+            EnterSequenceState(SEQUENCE_COMPLETE);
+        }
         break;
     }
 
@@ -683,7 +761,10 @@ void UpdateShowcaseSequenceInternal(void)
 VkResult Scene1_CreateTextures(void)
 {
     VkResult r = CreateCubemap(gSkyboxFaces, &sSkyImage, &sSkyMem, &sSkyView, &sSkySampler);
-    if (r != VK_SUCCESS) return r;
+    if (r != VK_SUCCESS)
+    {
+        return r;
+    }
     for (int i = 0; i < K_OVERLAY_COUNT; ++i)
     {
         VkResult rr = CreateTexture2D(gOverlayPathList[i],
@@ -691,7 +772,10 @@ VkResult Scene1_CreateTextures(void)
                                       &sOverlayMem[i],
                                       &sOverlayViews[i],
                                       &sOverlaySamplers[i]);
-        if (rr != VK_SUCCESS) return rr;
+        if (rr != VK_SUCCESS)
+        {
+            return rr;
+        }
     }
     sOverlayBound = 0;
     sOverlayPending = -1;
@@ -702,19 +786,43 @@ void Scene1_DestroyTextures(void)
 {
     for (int i = 0; i < K_OVERLAY_COUNT; ++i)
     {
-        if (sOverlaySamplers[i]) vkDestroySampler(gCtx_Switcher.vkDevice, sOverlaySamplers[i], NULL);
-        if (sOverlayViews[i])    vkDestroyImageView(gCtx_Switcher.vkDevice, sOverlayViews[i], NULL);
-        if (sOverlayMem[i])      vkFreeMemory(gCtx_Switcher.vkDevice, sOverlayMem[i], NULL);
-        if (sOverlayImages[i])   vkDestroyImage(gCtx_Switcher.vkDevice, sOverlayImages[i], NULL);
+        if (sOverlaySamplers[i])
+        {
+            vkDestroySampler(gCtx_Switcher.vkDevice, sOverlaySamplers[i], NULL);
+        }
+        if (sOverlayViews[i])
+        {
+            vkDestroyImageView(gCtx_Switcher.vkDevice, sOverlayViews[i], NULL);
+        }
+        if (sOverlayMem[i])
+        {
+            vkFreeMemory(gCtx_Switcher.vkDevice, sOverlayMem[i], NULL);
+        }
+        if (sOverlayImages[i])
+        {
+            vkDestroyImage(gCtx_Switcher.vkDevice, sOverlayImages[i], NULL);
+        }
         sOverlaySamplers[i] = VK_NULL_HANDLE;
         sOverlayViews[i]    = VK_NULL_HANDLE;
         sOverlayMem[i]      = VK_NULL_HANDLE;
         sOverlayImages[i]   = VK_NULL_HANDLE;
     }
-    if (sSkySampler) vkDestroySampler(gCtx_Switcher.vkDevice, sSkySampler, NULL);
-    if (sSkyView)    vkDestroyImageView(gCtx_Switcher.vkDevice, sSkyView, NULL);
-    if (sSkyMem)     vkFreeMemory(gCtx_Switcher.vkDevice, sSkyMem, NULL);
-    if (sSkyImage)   vkDestroyImage(gCtx_Switcher.vkDevice, sSkyImage, NULL);
+    if (sSkySampler)
+    {
+        vkDestroySampler(gCtx_Switcher.vkDevice, sSkySampler, NULL);
+    }
+    if (sSkyView)
+    {
+        vkDestroyImageView(gCtx_Switcher.vkDevice, sSkyView, NULL);
+    }
+    if (sSkyMem)
+    {
+        vkFreeMemory(gCtx_Switcher.vkDevice, sSkyMem, NULL);
+    }
+    if (sSkyImage)
+    {
+        vkDestroyImage(gCtx_Switcher.vkDevice, sSkyImage, NULL);
+    }
     sSkySampler = VK_NULL_HANDLE;
     sSkyView    = VK_NULL_HANDLE;
     sSkyMem     = VK_NULL_HANDLE;
@@ -888,7 +996,10 @@ VkResult Scene1_BindPendingOverlay(VkDescriptorSet descriptorSet)
 
 void Scene1_GetSkyDescriptor(VkDescriptorImageInfo* info)
 {
-    if (!info) return;
+    if (!info)
+    {
+        return;
+    }
     memset(info, 0, sizeof(*info));
     info->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     info->imageView = sSkyView;
@@ -897,7 +1008,10 @@ void Scene1_GetSkyDescriptor(VkDescriptorImageInfo* info)
 
 void Scene1_GetOverlayDescriptor(VkDescriptorImageInfo* info)
 {
-    if (!info) return;
+    if (!info)
+    {
+        return;
+    }
     memset(info, 0, sizeof(*info));
     VkImageView view = (sOverlayBound >= 0) ? sOverlayViews[sOverlayBound] : sOverlayViews[0];
     VkSampler sampler = (sOverlayBound >= 0) ? sOverlaySamplers[sOverlayBound] : sOverlaySamplers[0];
