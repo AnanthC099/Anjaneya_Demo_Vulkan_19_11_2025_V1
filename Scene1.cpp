@@ -113,25 +113,25 @@ typedef enum SequenceStateTag
     SEQUENCE_COMPLETE
 } SequenceState;
 
-static SequenceState sSequenceState = SEQUENCE_IDLE;
-static DWORD         sSequenceStateStartMs = 0;
-static BOOL          sScene1PostAnimHoldActive = FALSE;
-static DWORD         sScene1PostAnimHoldStartMs = 0;
-static BOOL          sScene1StartedViaOverlay = FALSE;
+SequenceState sSequenceState = SEQUENCE_IDLE;
+int sSequenceStateStartMs = 0;
+BOOL sScene1PostAnimHoldActive = FALSE;
+int sScene1PostAnimHoldStartMs = 0;
+BOOL sScene1StartedViaOverlay = FALSE;
 
-static float ease01(float x)
+float ease01(float x)
 {
     if (x < 0.0f) x = 0.0f;
     if (x > 1.0f) x = 1.0f;
     return x * x * (3.0f - 2.0f * x);
 }
 
-static float frand01(void)
+float frand01(void)
 {
     return (float)rand() / (float)RAND_MAX;
 }
 
-static void BindOverlayTexture(int which)
+void BindOverlayTexture(int which)
 {
     if (which < 0) return;
     if (which >= K_OVERLAY_COUNT) which = K_OVERLAY_COUNT - 1;
@@ -140,7 +140,7 @@ static void BindOverlayTexture(int which)
     sOverlayPending = which;
 }
 
-static glm::quat RandomOrientationQuat(void)
+glm::quat RandomOrientationQuat(void)
 {
     float u1 = frand01();
     float u2 = frand01() * 2.0f * glm::pi<float>();
@@ -154,7 +154,7 @@ static glm::quat RandomOrientationQuat(void)
     return glm::normalize(glm::quat(w, x, y, z));
 }
 
-static glm::quat RandomOrientationFarFrom(const glm::quat from, float minSepDeg)
+glm::quat RandomOrientationFarFrom(const glm::quat from, float minSepDeg)
 {
     glm::vec3 fPrev = from * glm::vec3(0.0f, 0.0f, -1.0f);
     float minDot = cosf(glm::radians(minSepDeg));
@@ -172,7 +172,7 @@ static glm::quat RandomOrientationFarFrom(const glm::quat from, float minSepDeg)
     return glm::normalize(flip * from);
 }
 
-static DWORD CalcPanDurationMs(const glm::quat q0, const glm::quat q1)
+DWORD CalcPanDurationMs(const glm::quat q0, const glm::quat q1)
 {
     glm::quat d = glm::normalize(q1 * glm::conjugate(q0));
     float w = d.w;
@@ -188,7 +188,7 @@ static DWORD CalcPanDurationMs(const glm::quat q0, const glm::quat q1)
     return (DWORD)(ms + 0.5f);
 }
 
-static void SetPanSpeedDegPerSec(float s)
+void SetPanSpeedDegPerSec(float s)
 {
     if (s < 1.0f)   s = 1.0f;
     if (s > 360.0f) s = 360.0f;
@@ -198,8 +198,16 @@ static void SetPanSpeedDegPerSec(float s)
     {
         float oldDur = (float)sPanDurationMs;
         float prog = (now - sPhaseStartMs) / oldDur;
-        if (prog < 0.0f) prog = 0.0f;
-        if (prog > 1.0f) prog = 1.0f;
+        
+		if (prog < 0.0f) 
+		{
+			prog = 0.0f;
+		}
+		
+        if (prog > 1.0f) 
+		{
+			prog = 1.0f;
+		}
         sPanSpeedDegPerSec = s;
         sPanDurationMs = CalcPanDurationMs(sCamQStart, sCamQTarget);
         sPhaseStartMs = now - (DWORD)(prog * (float)sPanDurationMs);
@@ -210,14 +218,14 @@ static void SetPanSpeedDegPerSec(float s)
     }
 }
 
-static void SetOverlaySizeFrac(float frac)
+void SetOverlaySizeFrac(float frac)
 {
     if (frac < 0.05f) frac = 0.05f;
     if (frac > 2.00f) frac = 2.00f;
     sOverlaySizeFrac = frac;
 }
 
-static void BeginNewPanInternal(void)
+void BeginNewPanInternal(void)
 {
     int which = sPansDone;
     if (which >= K_OVERLAY_COUNT) which = K_OVERLAY_COUNT - 1;
@@ -229,19 +237,19 @@ static void BeginNewPanInternal(void)
     sCamPhase      = CAM_PAN;
 }
 
-static float Clamp01(float x)
+float Clamp01(float x)
 {
     if (x < 0.0f) return 0.0f;
     if (x > 1.0f) return 1.0f;
     return x;
 }
 
-static BOOL IsSequenceActiveInternal(void)
+BOOL IsSequenceActiveInternal(void)
 {
     return sSequenceState != SEQUENCE_IDLE;
 }
 
-static void UpdateBlendFadeInternal(float fade)
+void UpdateBlendFadeInternal(float fade)
 {
     float clamped = Clamp01(fade);
     if (fabsf(clamped - sPendingBlendFade) > 1e-6f)
@@ -254,7 +262,7 @@ static void UpdateBlendFadeInternal(float fade)
     }
 }
 
-static float ComputeOverlayFadeForPan(void)
+float ComputeOverlayFadeForPan(void)
 {
     DWORD now = GetTickCount();
     if (sCamPhase == CAM_PAN)
@@ -286,12 +294,12 @@ static float ComputeOverlayFadeForPan(void)
     return 0.0f;
 }
 
-static BOOL IsScene1AnimationComplete(void)
+BOOL IsScene1AnimationComplete(void)
 {
     return sCamPhase == CAM_STOPPED;
 }
 
-static void ResetScene1ForSequence(void)
+void ResetScene1ForSequence(void)
 {
     sOverlayPending = -1;
     sOverlayBound   = -1;
@@ -305,7 +313,7 @@ static void ResetScene1ForSequence(void)
     sCmdBuffersDirty = TRUE;
 }
 
-static void EnterSequenceState(SequenceState state)
+void EnterSequenceState(SequenceState state)
 {
     sSequenceState = state;
     sSequenceStateStartMs = GetTickCount();
@@ -462,7 +470,7 @@ static void EnterSequenceState(SequenceState state)
     sCmdBuffersDirty = TRUE;
 }
 
-static void StopShowcaseSequenceInternal(void)
+void StopShowcaseSequenceInternal(void)
 {
     sSequenceState = SEQUENCE_IDLE;
     sScene1PostAnimHoldActive = FALSE;
@@ -477,7 +485,7 @@ static void StopShowcaseSequenceInternal(void)
     UpdateBlendFadeInternal(gCtx_Switcher.gFade);
 }
 
-static void UpdateShowcaseSequenceInternal(void)
+void UpdateShowcaseSequenceInternal(void)
 {
     if (!IsSequenceActiveInternal())
     {
