@@ -14,12 +14,9 @@ void Scenes_InitUniformIdentity(GlobalContext_MyUniformData* data)
 
 VkResult Scenes_WriteUniformData(VkDevice device, VkDeviceMemory memory, const GlobalContext_MyUniformData* data, FILE* logFile, const char* tag)
 {
-    if (device == VK_NULL_HANDLE || memory == VK_NULL_HANDLE || data == NULL) // Ithe gandta !!!
+    if (device == VK_NULL_HANDLE || memory == VK_NULL_HANDLE || data == NULL)
     {
-        if (logFile != NULL && tag != NULL)
-        {
-            fprintf(logFile, "%s --> invalid uniform buffer parameters\n", tag);
-        }
+        fprintf(logFile, "%s --> invalid uniform buffer parameters\n", tag);
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
