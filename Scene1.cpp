@@ -4,15 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
-#endif
-#ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#endif
-#ifndef GLM_ENABLE_EXPERIMENTAL
 #define GLM_ENABLE_EXPERIMENTAL
-#endif
 #include "glm/gtc/constants.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
@@ -21,32 +15,23 @@
 #include "SceneSwitcher.h"
 #include "Scenes.h"
 
-
-extern VkResult CreateTexture2D(const char* path,
-                                VkImage* outImg,
-                                VkDeviceMemory* outMem,
-                                VkImageView* outView,
-                                VkSampler* outSampler);
-extern VkResult CreateCubemap(const char* const faces[6],
-                              VkImage* outImg,
-                              VkDeviceMemory* outMem,
-                              VkImageView* outView,
-                              VkSampler* outSampler);
+extern VkResult CreateTexture2D(const char* path, VkImage* outImg, VkDeviceMemory* outMem, VkImageView* outView, VkSampler* outSampler);
+extern VkResult CreateCubemap(const char* const faces[6], VkImage* outImg, VkDeviceMemory* outMem, VkImageView* outView, VkSampler* outSampler);
 
 VkShaderModule gShaderModule_vertex_scene1 = VK_NULL_HANDLE;
 VkShaderModule gShaderModule_fragment_scene1 = VK_NULL_HANDLE;
 
-static const DWORD K_OVERLAY_LEAD_MS     = 450u;
-static const DWORD K_OVERLAY_FADE_MS     = 450u;
-static const DWORD K_HOLD_DURATION_MS    = 3000u;
-static const int   K_PAN_REPEATS         = 12;
-static const float K_MIN_SEP_DEG         = 90.0f;
-static const int   K_OVERLAY_COUNT       = 12;
-static const float K_OVERLAY_SIZE_FRAC0  = 0.55f;
-static float       sOverlaySizeFrac      = K_OVERLAY_SIZE_FRAC0;
-static float       sPanSpeedDegPerSec    = 30.0f;
+int K_OVERLAY_LEAD_MS     = 450u;
+int K_OVERLAY_FADE_MS     = 450u;
+int K_HOLD_DURATION_MS    = 3000u;
+int   K_PAN_REPEATS         = 12;
+float K_MIN_SEP_DEG         = 90.0f;
+int K_OVERLAY_COUNT       = 12;
+float K_OVERLAY_SIZE_FRAC0  = 0.55f;
+float sOverlaySizeFrac      = K_OVERLAY_SIZE_FRAC0;
+float sPanSpeedDegPerSec    = 30.0f;
 
-static const char* const gSkyboxFaces[6] =
+const char* const gSkyboxFaces[6] =
 {
     "images_Scene1/right.png",
     "images_Scene1/left.png",
