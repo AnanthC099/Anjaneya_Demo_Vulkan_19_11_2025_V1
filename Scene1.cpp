@@ -21,13 +21,13 @@ extern VkResult CreateCubemap(const char* const faces[6], VkImage* outImg, VkDev
 VkShaderModule gShaderModule_vertex_scene1 = VK_NULL_HANDLE;
 VkShaderModule gShaderModule_fragment_scene1 = VK_NULL_HANDLE;
 
-int K_OVERLAY_LEAD_MS     = 450u;
-int K_OVERLAY_FADE_MS     = 450u;
-int K_HOLD_DURATION_MS    = 3000u;
-int   K_PAN_REPEATS         = 12;
-float K_MIN_SEP_DEG         = 90.0f;
-int K_OVERLAY_COUNT       = 12;
-float K_OVERLAY_SIZE_FRAC0  = 0.55f;
+const int   K_OVERLAY_LEAD_MS     = 450;
+const int   K_OVERLAY_FADE_MS     = 450;
+const int   K_HOLD_DURATION_MS    = 3000;
+const int   K_PAN_REPEATS         = 12;
+const float K_MIN_SEP_DEG         = 90.0f;
+const int   K_OVERLAY_COUNT       = 12;
+const float K_OVERLAY_SIZE_FRAC0  = 0.55f;
 float sOverlaySizeFrac      = K_OVERLAY_SIZE_FRAC0;
 float sPanSpeedDegPerSec    = 30.0f;
 
