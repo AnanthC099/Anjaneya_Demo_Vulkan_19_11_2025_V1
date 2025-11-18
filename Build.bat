@@ -22,11 +22,11 @@ glslangValidator.exe -V -H -o Shader_Scene4.vert.spv Shader_Scene4.vert
 
 glslangValidator.exe -V -H -o Shader_Scene4.frag.spv Shader_Scene4.frag
 
-cl.exe /c /EHsc /I C:\VulkanSDK\Anjaneya\Include /I .\AL SceneSwitcher.cpp Scene0.cpp Scene1.cpp Scene2.cpp Scene3.cpp Scene4.cpp
+cl.exe /c /EHsc /I C:\VulkanSDK\Anjaneya\Include /I .\AL SceneSwitcher.cpp Scenes.cpp Scene0.cpp Scene1.cpp Scene2.cpp Scene3.cpp Scene4.cpp
 
 rc.exe Scene0.rc
 
-link.exe  SceneSwitcher.obj Scene0.obj Scene1.obj Scene2.obj Scene3.obj Scene4.obj Scene0.res OpenAL32.lib /LIBPATH:C:\VulkanSDK\Anjaneya\Lib /SUBSYSTEM:WINDOWS
+link.exe  SceneSwitcher.obj Scenes.obj Scene0.obj Scene1.obj Scene2.obj Scene3.obj Scene4.obj Scene0.res OpenAL32.lib /LIBPATH:C:\VulkanSDK\Anjaneya\Lib /SUBSYSTEM:WINDOWS
 
 SceneSwitcher.exe
 
