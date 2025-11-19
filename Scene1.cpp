@@ -92,7 +92,6 @@ const int K_SCENE3_HOLD_MS = 5000;
 const int K_SCENE3_PRE_FADE_WAIT_MS = 3500;
 const int K_SCENE3_FADE_TO_BLACK_MS = 7000;
 const int K_SCENE3_POST_BLACK_AUDIO_DELAY_MS = 5000;
-const int K_SCENE3_AUDIO_FADE_MS = K_SCENE3_FADE_TO_BLACK_MS;
 
 typedef enum SequenceStateTag
 {
@@ -109,7 +108,6 @@ typedef enum SequenceStateTag
     SEQUENCE_SCENE3_PRE_FADE_WAIT,
     SEQUENCE_SCENE3_FADE_TO_BLACK,
     SEQUENCE_SCENE3_POST_BLACK_AUDIO_HOLD,
-    SEQUENCE_SCENE3_AUDIO_FADE,
     SEQUENCE_COMPLETE
 } SequenceState;
 
@@ -507,17 +505,7 @@ void EnterSequenceState(SequenceState state)
         gCtx_Switcher.gScene23FocusPullFactor = 0.0f;
         gCtx_Switcher.gFade = 0.0f;
         UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        SceneSwitcher_SetScene0AudioGain(1.0f);
-        break;
-    case SEQUENCE_SCENE3_AUDIO_FADE:
-        gActiveScene = ACTIVE_SCENE_SCENE3;
-        gCtx_Switcher.gScene01DoubleExposureActive = FALSE;
-        gCtx_Switcher.gScene12CrossfadeActive = FALSE;
-        gCtx_Switcher.gScene23FocusPullActive = FALSE;
-        gCtx_Switcher.gScene23FocusPullFactor = 0.0f;
-        gCtx_Switcher.gFade = 0.0f;
-        UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        SceneSwitcher_SetScene0AudioGain(1.0f);
+        SceneSwitcher_SetScene0AudioGain(0.0f);
         break;
     case SEQUENCE_COMPLETE:
         // End on black
@@ -711,7 +699,7 @@ void UpdateShowcaseSequenceInternal(void)
         float easedFade = ease01(fadeProgress);
         gCtx_Switcher.gFade = 1.0f - easedFade;
         UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        SceneSwitcher_SetScene0AudioGain(1.0f);
+        SceneSwitcher_SetScene0AudioGain(1.0f - easedFade);
         if (fabsf(gCtx_Switcher.gScene23FocusPullFactor) > 5e-4f)
         {
             gCtx_Switcher.gScene23FocusPullFactor = 0.0f;
@@ -727,27 +715,13 @@ void UpdateShowcaseSequenceInternal(void)
     case SEQUENCE_SCENE3_POST_BLACK_AUDIO_HOLD:
         gCtx_Switcher.gFade = 0.0f;
         UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        SceneSwitcher_SetScene0AudioGain(1.0f);
+        SceneSwitcher_SetScene0AudioGain(0.0f);
         elapsed = now - sSequenceStateStartMs;
         if (elapsed >= K_SCENE3_POST_BLACK_AUDIO_DELAY_MS)
-        {
-            EnterSequenceState(SEQUENCE_SCENE3_AUDIO_FADE);
-        }
-        break;
-
-    case SEQUENCE_SCENE3_AUDIO_FADE:
-    {
-        gCtx_Switcher.gFade = 0.0f;
-        UpdateBlendFadeInternal(gCtx_Switcher.gFade);
-        fadeProgress = Clamp01((now - sSequenceStateStartMs) / (float)K_SCENE3_AUDIO_FADE_MS);
-        float easedAudio = ease01(fadeProgress);
-        SceneSwitcher_SetScene0AudioGain(1.0f - easedAudio);
-        if (fadeProgress >= 1.0f)
         {
             EnterSequenceState(SEQUENCE_COMPLETE);
         }
         break;
-    }
 
     case SEQUENCE_COMPLETE:
         StopShowcaseSequenceInternal();
