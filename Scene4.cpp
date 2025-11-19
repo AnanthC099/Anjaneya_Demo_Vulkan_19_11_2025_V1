@@ -114,15 +114,15 @@ typedef struct Scene4Vec3ArrayTag
     array->capacity = 0;
 }
 
- bool Scene4Vec3Array_Reserve(Scene4Vec3Array* array, size_t requiredCapacity)
+BOOL Scene4Vec3Array_Reserve(Scene4Vec3Array* array, size_t requiredCapacity)
 {
     if (!array)
     {
-        return false;
+        return FALSE;
     }
     if (requiredCapacity <= array->capacity)
     {
-        return true;
+        return TRUE;
     }
 
     size_t newCapacity = (array->capacity == 0) ? 1U : array->capacity;
@@ -139,30 +139,30 @@ typedef struct Scene4Vec3ArrayTag
     glm::vec3* newData = (glm::vec3*)realloc(array->data, newCapacity * sizeof(glm::vec3));
     if (!newData)
     {
-        return false;
+        return FALSE;
     }
 
     array->data = newData;
     array->capacity = newCapacity;
-    return true;
+    return TRUE;
 }
 
- bool Scene4Vec3Array_Push(Scene4Vec3Array* array, const glm::vec3* value)
+BOOL Scene4Vec3Array_Push(Scene4Vec3Array* array, const glm::vec3* value)
 {
     if (!array || !value)
     {
-        return false;
+        return FALSE;
     }
     if (array->size >= array->capacity)
     {
         if (!Scene4Vec3Array_Reserve(array, array->size + 1U))
         {
-            return false;
+            return FALSE;
         }
     }
     array->data[array->size] = *value;
     array->size += 1U;
-    return true;
+    return TRUE;
 }
 
 const int SCENE4_EDGE_QUEUE_CAPACITY = 256;
@@ -184,7 +184,7 @@ typedef struct Scene4EdgeQueueTag
 
 typedef struct Scene4FireActiveEdgeTag
 {
-    bool expired;
+    BOOL expired;
     int startIndex;
     int endIndex;
     glm::vec3 deltaPos;
@@ -413,11 +413,11 @@ void Scene4EdgeQueue_Init(Scene4EdgeQueue* queue)
     }
 }
 
-bool Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int index)
+BOOL Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int index)
 {
     if (!queue || queue->count >= SCENE4_EDGE_QUEUE_CAPACITY)
     {
-        return false;
+        return FALSE;
     }
     Scene4EdgeExpiration value;
     value.priority = priority;
@@ -431,7 +431,7 @@ bool Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int index)
     }
     queue->entries[insertPosition] = value;
     queue->count += 1;
-    return true;
+    return TRUE;
 }
 
 Scene4EdgeExpiration Scene4EdgeQueue_Peek(const Scene4EdgeQueue* queue)
@@ -880,7 +880,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
 
     int createdIndex = *nextEdgeIndex;
     Scene4FireActiveEdge* activeEdge = &activeEdges[createdIndex];
-    activeEdge->expired = false;
+    activeEdge->expired = FALSE;
     activeEdge->startIndex = startIndex;
     activeEdge->endIndex = endIndex;
     activeEdge->prev = -1;
@@ -907,7 +907,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
 
     if (!Scene4EdgeQueue_Push(expirations, cornerDistance[endIndex], createdIndex))
     {
-        activeEdge->expired = true;
+        activeEdge->expired = TRUE;
         return -1;
     }
 
@@ -1075,7 +1075,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
             int nextIndex = edge->next;
             if ((prevIndex < 0) || (nextIndex < 0))
             {
-                edge->expired = true;
+                edge->expired = TRUE;
                 continue;
             }
 
@@ -1084,7 +1084,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
 
             if ((edge->endIndex != prevEdge->endIndex) && (edge->endIndex != nextEdgeRef->endIndex))
             {
-                edge->expired = true;
+                edge->expired = TRUE;
 
                 int edge1 = Scene4_FireCreateEdge(edge->endIndex,
                                                   incomingEdges[edge->endIndex][edge->startIndex],
@@ -1147,8 +1147,8 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
                     continue;
                 }
 
-                prevPtr->expired = true;
-                nextPtr->expired = true;
+                prevPtr->expired = TRUE;
+                nextPtr->expired = TRUE;
 
                 int merged = Scene4_FireCreateEdge(edge->endIndex,
                                                    incomingEdges[edge->endIndex][prevPtr->startIndex],
@@ -1170,7 +1170,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
                 int nextNext = nextPtr->next;
                 if ((prevPrev < 0) || (nextNext < 0))
                 {
-                    activeEdges[merged].expired = true;
+                    activeEdges[merged].expired = TRUE;
                     continue;
                 }
 
