@@ -39,8 +39,8 @@ void main()
     vec2 screen = vec2(max(1.0, ubo.overlayParams.y), max(1.0, ubo.overlayParams.z));
     vec2 fragPx = gl_FragCoord.xy;
 
-    // Desired overlay size (in pixels), centered on screen
-    float frac    = max(0.001, abs(ubo.overlayParams.w));  // fraction of min(screen.x, screen.y)
+    // Desired overlay size  and overlay is centered on screen
+    float frac    = max(0.001, abs(ubo.overlayParams.w));
     float targetM = frac * min(screen.x, screen.y);
 
     ivec2 texSizeI = textureSize(texOverlay, 0);
@@ -53,7 +53,7 @@ void main()
 
     vec2 sizePx   = texSize * s;
     vec2 center   = 0.5 * screen;
-    vec2 rectMin  = center - 0.5 * sizePx;     // top-left corner of overlay rect
+    vec2 rectMin  = center - 0.5 * sizePx; // top-left corner of overlay rect
     vec2 uv       = (fragPx - rectMin) / sizePx;
 
     // Overlay rectangle ulta asel tar
