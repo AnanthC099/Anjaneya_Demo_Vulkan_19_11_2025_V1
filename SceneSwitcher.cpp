@@ -7858,13 +7858,6 @@ VkResult buildCommandBuffers(void)
             }
             break;
         case ACTIVE_SCENE_SCENE2:
-            /*
-             * Scene 2 is a stand-alone fullscreen composition that does not
-             * require the Scene 1 offscreen colour buffer as a background
-             * layer.  Rendering the previous base layer briefly exposed the
-             * Scene 0 imagery while Scene 2 was being latched, so keep the
-             * compositing pass limited to the Scene 2 target only.
-             */
             baseScene = UINT32_MAX;
             overlayScene = 2;
             overlayWeight = transition;
@@ -8150,19 +8143,23 @@ static void ApplyScenePhase(SequencePhase phase)
         gCtx_Switcher.gFade = 1.0f;
         SceneSwitcher_SetScene0AudioGain(1.0f);
         break;
+		
     case SEQUENCE_PHASE_FADE_TO_BLACK_1:
     case SEQUENCE_PHASE_FADE_TO_BLACK_2:
         gActiveScene = ACTIVE_SCENE_NONE;
         gCtx_Switcher.gFade = 0.0f;
         break;
+		
     case SEQUENCE_PHASE_SCENE1:
         gActiveScene = ACTIVE_SCENE_SCENE1;
         gCtx_Switcher.gFade = 1.0f;
         break;
+		
     case SEQUENCE_PHASE_SCENE2:
         SceneSwitcher_EnableScene2Scene4Composite();
         gCtx_Switcher.gFade = 1.0f;
         break;
+		
     case SEQUENCE_PHASE_SCENE3:
         gActiveScene = ACTIVE_SCENE_SCENE3;
         gCtx_Switcher.gFade = 1.0f;
@@ -8171,11 +8168,14 @@ static void ApplyScenePhase(SequencePhase phase)
         gActiveScene = ACTIVE_SCENE_SCENE4;
         gCtx_Switcher.gFade = 1.0f;
         break;
+		
+	//Added by Sachin Aher,Sohel Shaikh (Please verify)
     case SEQUENCE_PHASE_SCENE2_SCENE4_OVERLAY:
         SceneSwitcher_EnableScene2Scene4Composite();
         gCtx_Switcher.gFade = 1.0f;
         gScene24OverlayUseSceneAlpha = TRUE;
         break;
+		
     case SEQUENCE_PHASE_COMPLETE:
     default:
         gActiveScene = ACTIVE_SCENE_NONE;
@@ -8190,9 +8190,7 @@ static void ApplyScenePhase(SequencePhase phase)
 
     if (gCtx_Switcher.gpFile != NULL)
     {
-        fprintf(gCtx_Switcher.gpFile,
-                "ApplyScenePhase() --> %s\n",
-                (phase == SEQUENCE_PHASE_COMPLETE) ? "Complete" : GetSceneName(gActiveScene));
+        fprintf(gCtx_Switcher.gpFile, "ApplyScenePhase() --> %s\n", (phase == SEQUENCE_PHASE_COMPLETE) ? "Complete" : GetSceneName(gActiveScene));
     }
 }
 
@@ -8202,7 +8200,7 @@ static void RequestScenePhase(SequencePhase phase)
     ApplyScenePhase(phase);
 }
 
-// Scene sequence management functions
+// Scene sequence management functions ithun pudhe yetil
 void StartSceneSequence(void)
 {
     RequestScenePhase(SEQUENCE_PHASE_SCENE0);
@@ -8235,7 +8233,7 @@ BOOL IsSceneSequenceActive(void)
     return gCtx_Switcher.gSequenceActive;
 }
 
-static void StartHighFrequencyTimer(void)
+void StartHighFrequencyTimer(void)
 {
     gHighFreqTimerRunning = FALSE;
     memset(&gHighFreqTimerFrequency, 0, sizeof(gHighFreqTimerFrequency));
@@ -8271,7 +8269,7 @@ static void StartHighFrequencyTimer(void)
                      (double)gHighFreqTimerFrequency.QuadPart / 1.0e6);
 }
 
-static void ResetTimelineLoggingState(void)
+void ResetTimelineLoggingState(void)
 {
     gTimelineLastActiveScene = (ActiveScene)(ACTIVE_SCENE_NONE - 1);
     gTimelinePrevScene01DoubleExposure = (BOOL)-1;
@@ -8280,7 +8278,7 @@ static void ResetTimelineLoggingState(void)
     gTimelinePrevScene23FocusPullFactor = -1.0f;
 }
 
-static void UpdateTimelineLogging(void)
+void UpdateTimelineLogging(void)
 {
     if (!gHighFreqTimerRunning || gCtx_Switcher.gpFile == NULL)
     {
@@ -8334,7 +8332,7 @@ static void UpdateTimelineLogging(void)
     }
 }
 
-static void LogTimelineEvent(const char* format, ...)
+void LogTimelineEvent(const char* format, ...)
 {
     if (format == NULL || gCtx_Switcher.gpFile == NULL)
     {
@@ -8367,7 +8365,7 @@ static void LogTimelineEvent(const char* format, ...)
     fflush(gCtx_Switcher.gpFile);
 }
 
-static const char* GetSceneName(ActiveScene scene)
+const char* GetSceneName(ActiveScene scene)
 {
     switch (scene)
     {
@@ -8381,7 +8379,7 @@ static const char* GetSceneName(ActiveScene scene)
     }
 }
 
-static ALenum GetOpenALFormat(uint16_t channels, uint16_t bitsPerSample)
+ALenum GetOpenALFormat(uint16_t channels, uint16_t bitsPerSample)
 {
     if (channels == 1)
     {
@@ -8398,7 +8396,7 @@ static ALenum GetOpenALFormat(uint16_t channels, uint16_t bitsPerSample)
     return 0;
 }
 
-static BOOL LoadWaveFileIntoBuffer(const char* filename, ALuint buffer)
+BOOL LoadWaveFileIntoBuffer(const char* filename, ALuint buffer)
 {
     FILE* file = fopen(filename, "rb");
     if (!file)
@@ -8504,7 +8502,7 @@ static BOOL LoadWaveFileIntoBuffer(const char* filename, ALuint buffer)
     return alGetError() == AL_NO_ERROR;
 }
 
-static BOOL EnsureScene0AudioInitialized(void)
+BOOL EnsureScene0AudioInitialized(void)
 {
     if (gScene0AudioInitialized)
     {
@@ -8571,7 +8569,7 @@ void SceneSwitcher_SetScene0AudioGain(float gain)
     }
 }
 
-static void ShutdownScene0Audio(void)
+void ShutdownScene0Audio(void)
 {
     if (gScene0AudioInitialized)
     {

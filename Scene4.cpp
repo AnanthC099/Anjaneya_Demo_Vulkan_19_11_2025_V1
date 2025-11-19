@@ -6,15 +6,9 @@
 #include <stdint.h>
 #include <math.h>
 
-#ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
-#endif
-#ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#endif
-#ifndef GLM_ENABLE_EXPERIMENTAL
 #define GLM_ENABLE_EXPERIMENTAL
-#endif
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/constants.hpp"
@@ -22,61 +16,57 @@
 #include "SceneSwitcher.h"
 #include "Scenes.h"
 
-extern VkResult CreateTexture2D(const char* path,
-                                VkImage* outImg,
-                                VkDeviceMemory* outMem,
-                                VkImageView* outView,
-                                VkSampler* outSampler);
+extern VkResult CreateTexture2D(const char* path, VkImage* outImg, VkDeviceMemory* outMem, VkImageView* outView, VkSampler* outSampler);
 
 /* ------------------------- Scene 4 fire effect data ------------------------ */
 
-static const uint32_t SCENE4_SLICE_COUNT_DEFAULT = 8;
-static const uint32_t SCENE4_SLICE_COUNT_MIN     = 8;
-static const uint32_t SCENE4_SLICE_COUNT_MAX     = 256;
-static const uint32_t SCENE4_SLICE_COUNT_STEP    = 8;
-static const float    SCENE4_DEFAULT_RADIUS      = 1.25f;
-static const float    SCENE4_RADIUS_MIN          = 0.1f;
-static const float    SCENE4_RADIUS_MAX          = 3.0f;
-static const float    SCENE4_RADIUS_STEP         = 0.05f;
-static const float    SCENE4_DEFAULT_HEIGHT      = 4.2f;
-static const float    SCENE4_HEIGHT_MIN          = 0.5f;
-static const float    SCENE4_HEIGHT_MAX          = 5.0f;
-static const float    SCENE4_HEIGHT_STEP         = 0.1f;
-static const float    SCENE4_DEFAULT_SCALE_X     = 1.25f;
-static const float    SCENE4_DEFAULT_SCALE_Y     = 2.75f;
-static const float    SCENE4_DEFAULT_SCALE_Z     = 1.25f;
-static const float    SCENE4_SCALE_MIN           = 0.1f;
-static const float    SCENE4_SCALE_MAX           = 5.0f;
-static const float    SCENE4_SCALE_STEP          = 0.1f;
-static const float    SCENE4_DEFAULT_SCROLL      = 0.85f;
-static const float    SCENE4_SCROLL_MIN          = 0.0f;
-static const float    SCENE4_SCROLL_MAX          = 3.0f;
-static const float    SCENE4_SCROLL_STEP         = 0.05f;
-static const float    SCENE4_DEFAULT_TURBULENCE  = 2.0f;
-static const float    SCENE4_TURBULENCE_MIN      = 0.0f;
-static const float    SCENE4_TURBULENCE_MAX      = 3.0f;
-static const float    SCENE4_TURBULENCE_STEP     = 0.1f;
-static const float    SCENE4_DEFAULT_TIME_SPEED  = 0.02f;
-static const float    SCENE4_TIME_SPEED_MIN      = 0.0f;
-static const float    SCENE4_TIME_SPEED_MAX      = 5.0f;
-static const float    SCENE4_TIME_SPEED_STEP     = 0.02f;
-static const float    SCENE4_DEFAULT_OFFSET_X    = 0.0f;
-static const float    SCENE4_DEFAULT_OFFSET_Y    = 0.0f;
-static const float    SCENE4_DEFAULT_OFFSET_Z    = -10.0f;
-static const float    SCENE4_OFFSET_X_MIN        = -10.0f;
-static const float    SCENE4_OFFSET_X_MAX        =  10.0f;
-static const float    SCENE4_OFFSET_Z_MIN        = -10.0f;
-static const float    SCENE4_OFFSET_Z_MAX        =  10.0f;
-static const float    SCENE4_OFFSET_Y_MIN        =  -2.0f;
-static const float    SCENE4_OFFSET_Y_MAX        =   4.0f;
-static const float    SCENE4_OFFSET_STEP_XZ      =  0.25f;
-static const float    SCENE4_OFFSET_STEP_Y       =  0.25f;
-static const float    SCENE4_BASE_DELTA_TIME     = 0.016f;
-static const float    SCENE4_TIME_WRAP           = 1000.0f;
-static const uint32_t SCENE4_FIRE_COLUMN_COUNT   = 3;
-static const float    SCENE4_FIRE_DUPLICATE_GAP  = 6.2f;
+const uint32_t SCENE4_SLICE_COUNT_DEFAULT = 8;
+const uint32_t SCENE4_SLICE_COUNT_MIN     = 8;
+const uint32_t SCENE4_SLICE_COUNT_MAX     = 256;
+const uint32_t SCENE4_SLICE_COUNT_STEP    = 8;
+const float    SCENE4_DEFAULT_RADIUS      = 1.25f;
+const float    SCENE4_RADIUS_MIN          = 0.1f;
+const float    SCENE4_RADIUS_MAX          = 3.0f;
+const float    SCENE4_RADIUS_STEP         = 0.05f;
+const float    SCENE4_DEFAULT_HEIGHT      = 4.2f;
+const float    SCENE4_HEIGHT_MIN          = 0.5f;
+const float    SCENE4_HEIGHT_MAX          = 5.0f;
+const float    SCENE4_HEIGHT_STEP         = 0.1f;
+const float    SCENE4_DEFAULT_SCALE_X     = 1.25f;
+const float    SCENE4_DEFAULT_SCALE_Y     = 2.75f;
+const float    SCENE4_DEFAULT_SCALE_Z     = 1.25f;
+const float    SCENE4_SCALE_MIN           = 0.1f;
+const float    SCENE4_SCALE_MAX           = 5.0f;
+const float    SCENE4_SCALE_STEP          = 0.1f;
+const float    SCENE4_DEFAULT_SCROLL      = 0.85f;
+const float    SCENE4_SCROLL_MIN          = 0.0f;
+const float    SCENE4_SCROLL_MAX          = 3.0f;
+const float    SCENE4_SCROLL_STEP         = 0.05f;
+const float    SCENE4_DEFAULT_TURBULENCE  = 2.0f;
+ const float    SCENE4_TURBULENCE_MIN      = 0.0f;
+ const float    SCENE4_TURBULENCE_MAX      = 3.0f;
+ const float    SCENE4_TURBULENCE_STEP     = 0.1f;
+ const float    SCENE4_DEFAULT_TIME_SPEED  = 0.02f;
+ const float    SCENE4_TIME_SPEED_MIN      = 0.0f;
+ const float    SCENE4_TIME_SPEED_MAX      = 5.0f;
+ const float    SCENE4_TIME_SPEED_STEP     = 0.02f;
+ const float    SCENE4_DEFAULT_OFFSET_X    = 0.0f;
+ const float    SCENE4_DEFAULT_OFFSET_Y    = 0.0f;
+ const float    SCENE4_DEFAULT_OFFSET_Z    = -10.0f;
+ const float    SCENE4_OFFSET_X_MIN        = -10.0f;
+ const float    SCENE4_OFFSET_X_MAX        =  10.0f;
+ const float    SCENE4_OFFSET_Z_MIN        = -10.0f;
+ const float    SCENE4_OFFSET_Z_MAX        =  10.0f;
+ const float    SCENE4_OFFSET_Y_MIN        =  -2.0f;
+ const float    SCENE4_OFFSET_Y_MAX        =   4.0f;
+ const float    SCENE4_OFFSET_STEP_XZ      =  0.25f;
+ const float    SCENE4_OFFSET_STEP_Y       =  0.25f;
+ const float    SCENE4_BASE_DELTA_TIME     = 0.016f;
+ const float    SCENE4_TIME_WRAP           = 1000.0f;
+ const uint32_t SCENE4_FIRE_COLUMN_COUNT   = 3;
+ const float    SCENE4_FIRE_DUPLICATE_GAP  = 6.2f;
 
-static uint32_t Scene4_ClampSliceCount(uint32_t sliceCount)
+uint32_t Scene4_ClampSliceCount(uint32_t sliceCount)
 {
     if (sliceCount == 0)
     {
@@ -100,7 +90,7 @@ typedef struct Scene4Vec3ArrayTag
     size_t capacity;
 } Scene4Vec3Array;
 
-static void Scene4Vec3Array_Clear(Scene4Vec3Array* array)
+ void Scene4Vec3Array_Clear(Scene4Vec3Array* array)
 {
     if (!array)
     {
@@ -109,7 +99,7 @@ static void Scene4Vec3Array_Clear(Scene4Vec3Array* array)
     array->size = 0;
 }
 
-static void Scene4Vec3Array_Free(Scene4Vec3Array* array)
+ void Scene4Vec3Array_Free(Scene4Vec3Array* array)
 {
     if (!array)
     {
@@ -124,7 +114,7 @@ static void Scene4Vec3Array_Free(Scene4Vec3Array* array)
     array->capacity = 0;
 }
 
-static bool Scene4Vec3Array_Reserve(Scene4Vec3Array* array, size_t requiredCapacity)
+ bool Scene4Vec3Array_Reserve(Scene4Vec3Array* array, size_t requiredCapacity)
 {
     if (!array)
     {
@@ -157,7 +147,7 @@ static bool Scene4Vec3Array_Reserve(Scene4Vec3Array* array, size_t requiredCapac
     return true;
 }
 
-static bool Scene4Vec3Array_Push(Scene4Vec3Array* array, const glm::vec3* value)
+ bool Scene4Vec3Array_Push(Scene4Vec3Array* array, const glm::vec3* value)
 {
     if (!array || !value)
     {
@@ -175,10 +165,10 @@ static bool Scene4Vec3Array_Push(Scene4Vec3Array* array, const glm::vec3* value)
     return true;
 }
 
-static const int SCENE4_EDGE_QUEUE_CAPACITY = 256;
-static const int SCENE4_FIRE_MAX_ACTIVE_EDGES = 12;
-static const int SCENE4_FIRE_CORNER_COUNT = 8;
-static const int SCENE4_FIRE_CORNER_NEIGHBOR_COUNT = 3;
+const int SCENE4_EDGE_QUEUE_CAPACITY = 256;
+const int SCENE4_FIRE_MAX_ACTIVE_EDGES = 12;
+const int SCENE4_FIRE_CORNER_COUNT = 8;
+const int SCENE4_FIRE_CORNER_NEIGHBOR_COUNT = 3;
 
 typedef struct Scene4EdgeExpirationTag
 {
@@ -229,6 +219,7 @@ typedef struct Scene4StateTag
     BOOL geometryDirty;
 } Scene4State;
 
+//Given by Sachin Aher (Verify)
 static Scene4State gScene4State = {
     /* positions        */ { NULL, 0U, 0U },
     /* localCoords      */ { NULL, 0U, 0U },
@@ -252,7 +243,7 @@ static Scene4State gScene4State = {
     /* geometryDirty    */ TRUE
 };
 
-static int Scene4_NormalizeDirection(int direction)
+int Scene4_NormalizeDirection(int direction)
 {
     if (direction > 0)
     {
@@ -265,7 +256,7 @@ static int Scene4_NormalizeDirection(int direction)
     return 0;
 }
 
-static BOOL Scene4_AdjustUint32Step(uint32_t* value,
+ BOOL Scene4_AdjustUint32Step(uint32_t* value,
                                     int direction,
                                     uint32_t step,
                                     uint32_t minValue,
@@ -301,7 +292,7 @@ static BOOL Scene4_AdjustUint32Step(uint32_t* value,
     return TRUE;
 }
 
-static BOOL Scene4_AdjustFloatStep(float* value,
+BOOL Scene4_AdjustFloatStep(float* value,
                                    int direction,
                                    float step,
                                    float minValue,
@@ -337,7 +328,7 @@ static BOOL Scene4_AdjustFloatStep(float* value,
     return TRUE;
 }
 
-static BOOL Scene4_SliceCountExceedsCapacity(uint32_t sliceCount)
+BOOL Scene4_SliceCountExceedsCapacity(uint32_t sliceCount)
 {
     if (sliceCount == 0)
     {
@@ -351,12 +342,12 @@ static BOOL Scene4_SliceCountExceedsCapacity(uint32_t sliceCount)
     return requiredVertices > (uint64_t)gScene4State.vertexCapacity;
 }
 
-static void Scene4_RequestGeometryRefresh(void)
+void Scene4_RequestGeometryRefresh(void)
 {
     gScene4State.geometryDirty = TRUE;
 }
 
-static void Scene4_LogParameterFloat(const char* label, float value)
+void Scene4_LogParameterFloat(const char* label, float value)
 {
     if (gCtx_Switcher.gpFile && label)
     {
@@ -364,7 +355,7 @@ static void Scene4_LogParameterFloat(const char* label, float value)
     }
 }
 
-static void Scene4_LogParameterUint(const char* label, uint32_t value)
+void Scene4_LogParameterUint(const char* label, uint32_t value)
 {
     if (gCtx_Switcher.gpFile && label)
     {
@@ -372,7 +363,7 @@ static void Scene4_LogParameterUint(const char* label, uint32_t value)
     }
 }
 
-static void Scene4_LogFireParameters(const char* tag)
+void Scene4_LogFireParameters(const char* tag)
 {
     if (!gCtx_Switcher.gpFile)
     {
@@ -396,7 +387,7 @@ static void Scene4_LogFireParameters(const char* tag)
               gScene4State.fireOffsetZ);
 }
 
-static glm::vec3 Scene4_GetFireColumnOffset(uint32_t columnIndex)
+glm::vec3 Scene4_GetFireColumnOffset(uint32_t columnIndex)
 {
     if (columnIndex == 0)
     {
@@ -414,7 +405,7 @@ static glm::vec3 Scene4_GetFireColumnOffset(uint32_t columnIndex)
     return glm::vec3(direction * offsetMagnitude, 0.0f, 0.0f);
 }
 
-static void Scene4EdgeQueue_Init(Scene4EdgeQueue* queue)
+void Scene4EdgeQueue_Init(Scene4EdgeQueue* queue)
 {
     if (queue)
     {
@@ -422,7 +413,7 @@ static void Scene4EdgeQueue_Init(Scene4EdgeQueue* queue)
     }
 }
 
-static bool Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int index)
+bool Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int index)
 {
     if (!queue || queue->count >= SCENE4_EDGE_QUEUE_CAPACITY)
     {
@@ -443,7 +434,7 @@ static bool Scene4EdgeQueue_Push(Scene4EdgeQueue* queue, float priority, int ind
     return true;
 }
 
-static Scene4EdgeExpiration Scene4EdgeQueue_Peek(const Scene4EdgeQueue* queue)
+Scene4EdgeExpiration Scene4EdgeQueue_Peek(const Scene4EdgeQueue* queue)
 {
     Scene4EdgeExpiration result;
     result.priority = 0.0f;
@@ -455,7 +446,7 @@ static Scene4EdgeExpiration Scene4EdgeQueue_Peek(const Scene4EdgeQueue* queue)
     return queue->entries[0];
 }
 
-static void Scene4EdgeQueue_Pop(Scene4EdgeQueue* queue)
+void Scene4EdgeQueue_Pop(Scene4EdgeQueue* queue)
 {
     if (!queue || queue->count <= 0)
     {
@@ -479,7 +470,7 @@ typedef struct alignas(16) Scene4ShaderUniformLegacyTag
     float _padding; // ensures std140 alignment for the vec3 viewPos
 } Scene4ShaderUniformLegacy;
 
-static BOOL Scene4_FindMemoryTypeIndex(uint32_t typeBits,
+BOOL Scene4_FindMemoryTypeIndex(uint32_t typeBits,
                                        VkMemoryPropertyFlags properties,
                                        uint32_t* outIndex)
 {
@@ -501,7 +492,7 @@ static BOOL Scene4_FindMemoryTypeIndex(uint32_t typeBits,
     return FALSE;
 }
 
-static VkResult Scene4_RebuildSampler(VkSampler* sampler, VkSamplerAddressMode addressMode)
+VkResult Scene4_RebuildSampler(VkSampler* sampler, VkSamplerAddressMode addressMode)
 {
   if (!sampler)
   {
@@ -593,11 +584,7 @@ BOOL Scene4_AdjustFireSliceCount(int direction, BOOL* outRequiresRebuild)
         *outRequiresRebuild = FALSE;
     }
 
-    if (!Scene4_AdjustUint32Step(&gScene4State.fireSliceCount,
-                                 direction,
-                                 SCENE4_SLICE_COUNT_STEP,
-                                 SCENE4_SLICE_COUNT_MIN,
-                                 SCENE4_SLICE_COUNT_MAX))
+    if (!Scene4_AdjustUint32Step(&gScene4State.fireSliceCount, direction, SCENE4_SLICE_COUNT_STEP, SCENE4_SLICE_COUNT_MIN, SCENE4_SLICE_COUNT_MAX))
     {
         return FALSE;
     }
@@ -614,11 +601,7 @@ BOOL Scene4_AdjustFireSliceCount(int direction, BOOL* outRequiresRebuild)
 
 BOOL Scene4_AdjustFireRadius(int direction)
 {
-    if (!Scene4_AdjustFloatStep(&gScene4State.fireRadius,
-                                direction,
-                                SCENE4_RADIUS_STEP,
-                                SCENE4_RADIUS_MIN,
-                                SCENE4_RADIUS_MAX))
+    if (!Scene4_AdjustFloatStep(&gScene4State.fireRadius, direction, SCENE4_RADIUS_STEP, SCENE4_RADIUS_MIN, SCENE4_RADIUS_MAX))
     {
         return FALSE;
     }
@@ -873,7 +856,7 @@ BOOL Scene4_ResetFireParameters(BOOL* outRequiresRebuild)
 }
 
 
-static int Scene4_FireCreateEdge(int startIndex,
+ int Scene4_FireCreateEdge(int startIndex,
                                  int endIndex,
                                  float sliceDistance,
                                  float sliceSpacing,
@@ -931,7 +914,7 @@ static int Scene4_FireCreateEdge(int startIndex,
     return createdIndex;
 }
 
-static VkResult Scene4_EmitFireSlices(const glm::vec3& columnWorldCenter,
+ VkResult Scene4_EmitFireSlices(const glm::vec3& columnWorldCenter,
                                       const glm::vec3& columnOffset,
                                       float widthHalf,
                                       float depthHalf,
@@ -1251,7 +1234,7 @@ static VkResult Scene4_EmitFireSlices(const glm::vec3& columnWorldCenter,
     return VK_SUCCESS;
 }
 
-static VkResult Scene4_GenerateFireSlices(void)
+ VkResult Scene4_GenerateFireSlices(void)
 {
     Scene4Vec3Array_Clear(&gScene4State.positions);
     Scene4Vec3Array_Clear(&gScene4State.localCoords);
