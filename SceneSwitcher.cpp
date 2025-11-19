@@ -133,7 +133,6 @@ static void UpdateTimelineLogging(void);
 static void LogTimelineEvent(const char* format, ...);
 static const char* GetSceneName(ActiveScene scene);
 static ALenum GetOpenALFormat(uint16_t channels, uint16_t bitsPerSample);
-static BOOL SceneSwitcher_HandleScene1Char(int key);
 static VkCommandBuffer BeginOneShotCB(void)
 {
     VkCommandBufferAllocateInfo commandBufferAllocateInfo;
@@ -1383,19 +1382,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 }
                 break;
 
-        case WM_CHAR:
-        {
-            BOOL handled = FALSE;
-            int key = (int)wParam;
-
-            if (gActiveScene == ACTIVE_SCENE_SCENE1)
-            {
-                handled = SceneSwitcher_HandleScene1Char(key);
-            }
-
-            (void)handled;
-        } break;
-
         case WM_CLOSE:
                 DestroyWindow(hwnd);
                 break;
@@ -1409,31 +1395,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         }
 
     return(DefWindowProc(hwnd, iMsg, wParam, lParam));
-}
-
-static BOOL SceneSwitcher_HandleScene1Char(int key)
-{
-    switch (key)
-    {
-    case 'z':
-    case 'Z':
-        Scene1_AdjustPanSpeed(-10.0f);
-        return TRUE;
-    case 'x':
-    case 'X':
-        Scene1_AdjustPanSpeed(+10.0f);
-        return TRUE;
-    case 'c':
-    case 'C':
-        Scene1_AdjustOverlaySize(-0.02f);
-        return TRUE;
-    case 'v':
-    case 'V':
-        Scene1_AdjustOverlaySize(+0.02f);
-        return TRUE;
-    default:
-        return FALSE;
-    }
 }
 
 
