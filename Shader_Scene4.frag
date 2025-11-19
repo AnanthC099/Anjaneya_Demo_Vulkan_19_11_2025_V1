@@ -1,6 +1,9 @@
 #version 460 core
 #extension GL_ARB_separate_shader_objects : enable
 
+//Refer Book of Shaders and Texture and Modelling noise chapter for adjustments done
+//Reference taken : https://github.com/yomotsu/VolumetricFire (Take fire profile images and noise images from there)
+
 layout(location = 0) in vec3 out_TexCoord;
 layout(binding = 1) uniform sampler2D uTextureSampler;
 layout(binding = 2) uniform sampler2D uNoiseSampler;
@@ -30,10 +33,7 @@ float mnoise(vec3 pos)
     float fracArg = fract(pos.z);
     vec2 hash = mBBS(vec2(intArg) * 3.0 + vec2(0.0, 3.0));
 
-    vec4 g = vec4(
-        texture(uNoiseSampler, (vec2(pos.x, pos.y + hash.x)) / FIRE_NOISE_MODULUS).xy,
-        texture(uNoiseSampler, (vec2(pos.x, pos.y + hash.y)) / FIRE_NOISE_MODULUS).xy
-    ) * 2.0 - 1.0;
+    vec4 g = vec4(texture(uNoiseSampler, (vec2(pos.x, pos.y + hash.x)) / FIRE_NOISE_MODULUS).xy, texture(uNoiseSampler, (vec2(pos.x, pos.y + hash.y)) / FIRE_NOISE_MODULUS).xy) * 2.0 - 1.0;
 
     float g0 = g.x + g.y * fracArg;
     float g1 = g.z + g.w * (fracArg - 1.0);
